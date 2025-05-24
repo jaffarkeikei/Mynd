@@ -15,15 +15,14 @@ class Mynd:
     """Main Mynd application orchestrator"""
     
     def __init__(self, data_dir: Optional[str] = None):
-        if data_dir is None:
-            data_dir = str(Path.home() / ".myndai")
-        
-        self.data_dir = data_dir
-        os.makedirs(data_dir, exist_ok=True)
+        """Initialize Mynd with database and vector store"""
+        # Set up data directory
+        self.data_dir = data_dir or str(Path.home() / ".mynd")
+        Path(self.data_dir).mkdir(parents=True, exist_ok=True)
         
         # Initialize core components
-        self.db = MyndDB(os.path.join(data_dir, "mynd.db"))
-        self.vector_store = VectorStorage(os.path.join(data_dir, "chroma_db"))
+        self.db = MyndDB(os.path.join(self.data_dir, "mynd.db"))
+        self.vector_store = VectorStorage(os.path.join(self.data_dir, "chroma_db"))
         self.extractor = SemanticExtractor()
         
         # Server configuration
@@ -122,7 +121,7 @@ def main():
     try:
         asyncio.run(vault.run())
     except KeyboardInterrupt:
-        print("\n👋 Mynd shutting down...")
+        print("\n�� Mynd shutting down...")
     except (ConnectionError, OSError) as e:
         print(f"❌ Connection error: {e}")
         sys.exit(1)
