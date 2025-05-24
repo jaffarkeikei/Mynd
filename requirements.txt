@@ -1,0 +1,39 @@
+# Mynd Dependencies
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# AI & ML
+ollama==0.2.1
+chromadb==0.4.18
+sentence-transformers==2.2.2
+
+# Database & Storage  
+sqlite3  # Built into Python
+aiosqlite==0.19.0
+
+# Web & API
+requests==2.31.0
+beautifulsoup4==4.12.2
+selenium==4.15.2
+websockets==12.0
+
+# Security & Crypto
+cryptography==41.0.8
+pyjwt==2.8.0
+
+# System Integration
+watchdog==3.0.0  # File system monitoring
+psutil==5.9.6    # System monitoring
+click==8.1.7     # CLI interface
+
+# Development & Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+isort==5.12.0
+mypy==1.7.1
+
+# Optional: Browser Integration
+chromedriver-autoinstaller==0.6.2 
