@@ -912,7 +912,7 @@ async def chat(message: ChatMessage):
     # Original implementation with real Mynd
     try:
         if message.use_memory:
-            # MEMORY MODE: Always store and try to retrieve
+            # MEMORY MODE: Store message and respond intelligently based on confidence
             
             # 1. Always store the message first
             event = mynd.extractor.create_semantic_event(
@@ -924,54 +924,57 @@ async def chat(message: ChatMessage):
             mynd.db.store_event(event)
             mynd.vector_store.store_event(event)
             
-            # 2. Search for relevant context
+            # 2. Search for relevant context with confidence scores
             try:
-                memory_events = mynd.vector_store.search_similar(message.message, limit=5)
-                context = mynd.get_context_for_query(message.message, max_tokens=1000)
+                memory_events = mynd.vector_store.search_similar(message.message, limit=10)
+                
+                best_confidence = 0
+                best_content = None
                 
                 if memory_events and len(memory_events) > 0:
-                    # Found relevant memories - build response
-                    relevant_content = []
-                    for event in memory_events[:3]:  # Top 3 most relevant
+                    for event in memory_events:
                         if isinstance(event, dict):
                             content = event.get('content', '')
+                            # Convert distance to confidence (lower distance = higher confidence)
+                            distance = event.get('distance', 1.0)
+                            confidence = max(0, (1.0 - distance) * 100)  # Convert to percentage
                         else:
                             content = getattr(event, 'content', '')
+                            confidence = 50  # Default confidence for non-dict results
                         
-                        if content and content != message.message:  # Don't include the message we just stored
-                            relevant_content.append(content)
-                    
-                    if relevant_content:
-                        response = f"Based on your stored memories:\n\n"
-                        for i, content in enumerate(relevant_content, 1):
-                            response += f"{i}. {content[:200]}...\n"
-                    else:
-                        response = f"I've stored your message in memory. I don't have directly relevant memories yet, but I'll remember this for future conversations."
-                else:
-                    response = f"I've stored your message in memory. This is new information for me - I'll remember it for future conversations."
+                        # Skip if it's the same message we just stored, empty, or a question
+                        is_question = any(word in content.lower() for word in ['what', 'when', 'where', 'who', 'how', 'why']) or '?' in content
+                        is_greeting = any(word in content.lower() for word in ['hi', 'hello', 'hey'])
+                        is_same_message = content == message.message
+                        
+                        # Only use informational content (not questions or greetings)
+                        if (content and not is_same_message and not is_question and not is_greeting 
+                            and len(content.split()) > 3 and confidence > best_confidence):
+                            best_confidence = confidence
+                            best_content = content
                 
-                # Extract memory items for display
+                # Debug info
+                # print(f"Debug: Best confidence: {best_confidence}%, Content: {best_content[:50] if best_content else 'None'}")
+                
+                # Decide response based on confidence level
+                if best_confidence >= 50 and best_content:
+                    # High confidence - use retrieved information
+                    response = best_content.strip()
+                else:
+                    # Low confidence - generate natural AI response
+                    response = generate_ai_response(message.message)
+                
                 memory_context = []
-                for event in memory_events[:3]:
-                    if isinstance(event, dict):
-                        summary = event.get('content', '')
-                    else:
-                        summary = getattr(event, 'content', '')
-                    
-                    if summary and summary != message.message:
-                        summary = summary[:100] + "..." if len(summary) > 100 else summary
-                        memory_context.append(summary)
                 
             except Exception as e:
                 print(f"Error in memory retrieval: {e}")
-                response = f"I've stored your message in memory, but had trouble searching existing memories."
+                response = generate_ai_response(message.message)
                 memory_context = []
         
         else:
-            # NON-MEMORY MODE: Act like regular AI
-            response = "I don't have any context or memory about this topic. I can only provide general information without your specific history or preferences."
+            # NON-MEMORY MODE: Always use AI response
+            response = generate_ai_response(message.message)
             memory_context = []
-            context = ""
         
         # Calculate stats
         response_time = time.time() - start_time
@@ -1075,6 +1078,33 @@ async def add_memory(event: MemoryEvent):
         return {"success": success, "event_id": semantic_event.id}
     except Exception as e:
         return {"success": False, "event_id": None, "error": str(e)}
+
+def generate_ai_response(message):
+    """Generate natural AI responses for when confidence is low or memory is off"""
+    msg_lower = message.lower().strip()
+    
+    # Handle greetings naturally
+    if any(greeting in msg_lower for greeting in ['hi', 'hello', 'hey']):
+        return "Hello! How can I help you today?"
+    
+    if 'how are you' in msg_lower:
+        return "I'm doing well, thank you! How can I assist you?"
+    
+    if any(thanks in msg_lower for thanks in ['thank', 'thanks']):
+        return "You're welcome!"
+    
+    if any(bye in msg_lower for bye in ['bye', 'goodbye', 'see you']):
+        return "Goodbye! Have a great day!"
+    
+    # Handle questions
+    if any(question in msg_lower for question in ['what', 'when', 'where', 'who', 'how', 'why', '?']):
+        return "I don't have specific information about that. Could you provide more details?"
+    
+    # Handle statements
+    if len(message.split()) > 3:
+        return "I understand. Is there anything specific you'd like help with?"
+    else:
+        return "Got it. What can I help you with?"
 
 if __name__ == "__main__":
     import uvicorn
