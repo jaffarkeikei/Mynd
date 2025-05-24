@@ -49,6 +49,15 @@ class DemoLauncher:
                     "impact": "Foundation demo"
                 }
             },
+            "🌐 Web Interface": {
+                "web-app": {
+                    "file": "web_app.py",
+                    "description": "Beautiful ChatGPT-like web interface with memory toggle (BEST FOR JUDGES!)",
+                    "directory": "src",
+                    "time": "5 min",
+                    "impact": "Visual wow factor - side-by-side comparison!"
+                }
+            },
             "🤖 AI Integration Tests": {
                 "claude-integration": {
                     "file": "real_ai_integration.py",
@@ -281,10 +290,10 @@ class DemoLauncher:
         print("=" * 70)
         print("Running the most impressive demos in optimal order...\n")
         
-        # Optimal demo sequence for judges
+        # Optimal demo sequence for judges - NOW WITH WEB APP!
         demo_sequence = [
             ("api-test", "Quick validation that everything works"),
-            ("memory-test", "Show instant memory capabilities"),
+            ("web-app", "🌟 VISUAL WOW - ChatGPT-like interface with memory toggle!"),
             ("real-world-demo", "Complete real-world scenarios"),
             ("claude-integration", "Live AI enhancement demo")
         ]
@@ -301,7 +310,19 @@ class DemoLauncher:
             print(f"🎯 Demo {len(results)+1}/{len(demo_sequence)}: {reason}")
             print(f"{'='*70}")
             
-            success = self.run_demo(demo_id)
+            if demo_id == "web-app":
+                print("\n🌐 Starting web interface...")
+                print("📍 Open http://localhost:8000 in your browser")
+                print("🎪 Show the judges:")
+                print("   1. Toggle memory ON/OFF to see the difference")
+                print("   2. Try 'Side-by-Side Comparison' mode")
+                print("   3. Load demo data and ask about authentication")
+                print("\n⏸️  Press Enter when ready to continue...")
+                input()
+                success = True
+            else:
+                success = self.run_demo(demo_id)
+            
             results.append((demo_id, success))
             
             if success and len(results) < len(demo_sequence):
