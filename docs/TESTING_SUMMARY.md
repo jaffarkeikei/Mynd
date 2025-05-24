@@ -39,7 +39,7 @@ mynd query "authentication"
 ## 📊 Current System State
 
 From our testing:
-- **Data Directory**: `/Users/jaffars/.mynd/`
+- **Data Directory**: `/Users/user/.mynd/`
 - **Total Events**: 10+ memories stored
 - **MCP Server**: Running on port 8765
 - **API Keys**: Both ANTHROPIC_API_KEY and GOOGLE_API_KEY are set

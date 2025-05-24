@@ -18,7 +18,7 @@
 ## Test Results
 
 ### 1. Mynd Local Functionality ✅
-- **ChromaDB**: Successfully initialized at `/Users/jaffars/.myndai/chroma_db`
+- **ChromaDB**: Successfully initialized at `/Users/user/.myndai/chroma_db`
 - **Database**: Contains 23 semantic events
 - **Semantic Search**: Working perfectly - found relevant authentication context
 - **Query Processing**: Sub-second response times
