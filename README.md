@@ -10,6 +10,33 @@
 
 Mynd is a **universal memory layer** for AI that automatically captures your digital context and streams it securely to any AI via Model Context Protocol (MCP). Your AIs finally remember everything about you - your decisions, preferences, history, and patterns - while your data never leaves your device.
 
+## 🌟 NEW: Beautiful Web Interface
+
+Experience Mynd through our **ChatGPT-like web interface** that visually demonstrates the power of AI memory:
+
+![Mynd Web Interface Demo](https://img.shields.io/badge/Live_Demo-Try_Now-blue?style=for-the-badge)
+
+```bash
+# Quick start the web demo
+python scripts/start_web_demo.py
+
+# Or manually:
+python src/web_app.py
+# Open http://localhost:8000
+```
+
+### Key Features:
+- **🎭 Memory Toggle** - Switch memory ON/OFF to see the dramatic difference
+- **🔄 Side-by-Side Comparison** - Compare responses with and without memory
+- **📊 Real-time Metrics** - Watch response time, relevance scores, and token usage
+- **💬 ChatGPT-like Interface** - Beautiful, familiar, and intuitive
+- **🎯 Demo Mode** - Pre-loaded context for instant demonstrations
+
+### See The Difference:
+1. Ask: "What was our authentication decision?"
+2. Toggle memory OFF and ask again
+3. Watch the AI go from "I don't have context" to perfect recall!
+
 ## System Architecture
 
 ### High-Level Architecture
