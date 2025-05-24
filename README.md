@@ -266,14 +266,6 @@ graph TB
 - [x] Multiple query examples working
 - [x] Clear before/after comparison ready
 
-## Component Details
-
-For detailed component documentation and interaction diagrams, see:
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - Detailed system architecture
-- **[COMPONENTS.md](COMPONENTS.md)** - Component interaction diagrams
-- **[QUICKSTART.md](QUICKSTART.md)** - Installation and setup guide
-- **[BUILD_STATUS.md](BUILD_STATUS.md)** - Current implementation status
-
 ## Join the Memory Revolution
 
 Mynd isn't just a hackathon project - it's the future of AI interaction. We're building the memory layer that every AI desperately needs.

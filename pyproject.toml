@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "myndai"
+name = "mynd"
 version = "0.1.0"
-description = "Universal AI memory layer for secure, local context sharing"
+description = "Universal AI Memory - Give every AI perfect memory of YOUR context"
 authors = [
     {name = "Mynd Team", email = "team@mynd.ai"}
 ]
