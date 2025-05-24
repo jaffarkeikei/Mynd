@@ -911,50 +911,78 @@ async def chat(message: ChatMessage):
     
     # Original implementation with real Mynd
     try:
-        # Store the message as an event if memory is enabled
         if message.use_memory:
+            # MEMORY MODE: Always store and try to retrieve
+            
+            # 1. Always store the message first
             event = mynd.extractor.create_semantic_event(
-                source_type="chat",
-                source_path="web_interface",
+                source_type="user_input",
+                source_path="web_interface", 
                 content=message.message,
                 metadata={"timestamp": datetime.now().isoformat()}
             )
             mynd.db.store_event(event)
             mynd.vector_store.store_event(event)
+            
+            # 2. Search for relevant context
+            try:
+                memory_events = mynd.vector_store.search_similar(message.message, limit=5)
+                context = mynd.get_context_for_query(message.message, max_tokens=1000)
+                
+                if memory_events and len(memory_events) > 0:
+                    # Found relevant memories - build response
+                    relevant_content = []
+                    for event in memory_events[:3]:  # Top 3 most relevant
+                        if isinstance(event, dict):
+                            content = event.get('content', '')
+                        else:
+                            content = getattr(event, 'content', '')
+                        
+                        if content and content != message.message:  # Don't include the message we just stored
+                            relevant_content.append(content)
+                    
+                    if relevant_content:
+                        response = f"Based on your stored memories:\n\n"
+                        for i, content in enumerate(relevant_content, 1):
+                            response += f"{i}. {content[:200]}...\n"
+                    else:
+                        response = f"I've stored your message in memory. I don't have directly relevant memories yet, but I'll remember this for future conversations."
+                else:
+                    response = f"I've stored your message in memory. This is new information for me - I'll remember it for future conversations."
+                
+                # Extract memory items for display
+                memory_context = []
+                for event in memory_events[:3]:
+                    if isinstance(event, dict):
+                        summary = event.get('content', '')
+                    else:
+                        summary = getattr(event, 'content', '')
+                    
+                    if summary and summary != message.message:
+                        summary = summary[:100] + "..." if len(summary) > 100 else summary
+                        memory_context.append(summary)
+                
+            except Exception as e:
+                print(f"Error in memory retrieval: {e}")
+                response = f"I've stored your message in memory, but had trouble searching existing memories."
+                memory_context = []
         
-        # Generate response based on memory setting
-        if message.use_memory:
-            # Get relevant context
-            context = mynd.get_context_for_query(message.message, max_tokens=2000)
-            memory_events = mynd.vector_store.search_similar(message.message, limit=5)
-            
-            # Create response with context
-            if context:
-                response = f"Based on your stored memories: {context[:500]}..."
-            else:
-                response = "I\'m checking my memory but don\'t have specific context about that yet. Try loading demo data first!"
-            
-            # Extract memory items for display
-            memory_context = []
-            for event in memory_events:
-                summary = event.semantic_summary[:100] + "..." if len(event.semantic_summary) > 100 else event.semantic_summary
-                memory_context.append(summary)
         else:
-            # Generic response without memory
-            response = "I don\'t have any context or memory about this topic. I can only provide general information without your specific history or preferences."
+            # NON-MEMORY MODE: Act like regular AI
+            response = "I don't have any context or memory about this topic. I can only provide general information without your specific history or preferences."
             memory_context = []
             context = ""
         
         # Calculate stats
         response_time = time.time() - start_time
-        relevance_score = 85 if message.use_memory and context else 0
+        relevance_score = 85 if message.use_memory and len(memory_context) > 0 else 0
         
         return {
             "response": response,
             "memory_context": memory_context,
             "stats": {
                 "response_time": response_time,
-                "memory_used": len(context) // 4 if context else 0,
+                "memory_used": len(response) // 4 if message.use_memory else 0,
                 "relevance_score": relevance_score,
                 "total_events": get_total_events()
             }
@@ -1051,7 +1079,7 @@ async def add_memory(event: MemoryEvent):
 if __name__ == "__main__":
     import uvicorn
     print("🌐 Starting Mynd Web Interface...")
-    print("📍 Open http://localhost:8000 in your browser")
+    print("📍 Open http://localhost:8001 in your browser")
     print("🏆 This will impress the hackathon judges!")
     
     # Check if running in a virtual environment
@@ -1060,4 +1088,4 @@ if __name__ == "__main__":
         print("   Consider activating your venv first")
     
     # Run the server
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+    uvicorn.run(app, host="0.0.0.0", port=8001) 
