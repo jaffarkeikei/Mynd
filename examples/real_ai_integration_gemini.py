@@ -14,8 +14,8 @@ try:
 except ImportError:
     GEMINI_AVAILABLE = False
 
-class MyndAIGeminiIntegration:
-    """Real integration between Mynd and Google Gemini"""
+class MyndGeminiIntegration:
+    """Integration between Mynd memory system and Gemini AI"""
     
     def __init__(self):
         self.mynd_base_url = "http://localhost:8080"
@@ -298,7 +298,7 @@ def main():
         print("   3. Install: pip install google-generativeai")
         print("\nRunning with simulated responses for now...\n")
     
-    integration = MyndAIGeminiIntegration()
+    integration = MyndGeminiIntegration()
     integration.run_multi_scenario_demo()
     integration.measure_real_impact()
     

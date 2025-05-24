@@ -14,8 +14,8 @@ try:
 except ImportError:
     ANTHROPIC_AVAILABLE = False
 
-class MyndAIClaudeIntegration:
-    """Real integration between Mynd and Claude"""
+class MyndClaudeIntegration:
+    """Integration between Mynd memory system and Claude AI"""
     
     def __init__(self):
         self.mynd_base_url = "http://localhost:8080"
@@ -312,17 +312,18 @@ Provide a helpful, specific response that references the actual decisions and im
         print("   • 100% of responses showed context awareness")
 
 def main():
+    """Run the real AI integration demo"""
     print("🚀 Starting Real AI Integration Demo")
-    print("This demo shows how Mynd enhances Claude with project context\n")
+    print("This demo shows how Mynd enhances Claude with project context")
     
     # Check for API key
-    if not os.getenv('ANTHROPIC_API_KEY') or not ANTHROPIC_AVAILABLE:
-        print("💡 To use real Claude API:")
+    if not os.getenv('ANTHROPIC_API_KEY') and ANTHROPIC_AVAILABLE:
+        print("\n💡 To use real Claude API:")
         print("   export ANTHROPIC_API_KEY='your-api-key-here'")
         print("   pip install anthropic")
-        print("\nRunning with simulated responses for now...\n")
+        print("\nRunning with simulated responses for now...")
     
-    integration = MyndAIClaudeIntegration()
+    integration = MyndClaudeIntegration()
     integration.run_real_world_demos()
     integration.measure_context_impact()
     
